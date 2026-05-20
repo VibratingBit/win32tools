@@ -1,0 +1,15 @@
+@PACKAGE_INIT@
+
+# win32toolsConfig.cmake
+# Provides the imported target w32t::win32tools.
+#
+# Usage in consumer CMakeLists.txt:
+#   find_package(win32tools 2.0 CONFIG REQUIRED)
+#   target_link_libraries(MyApp PRIVATE w32t::win32tools)
+
+include(CMakeFindDependencyMacro)
+
+# Pull in the exported targets (win32toolsTargets.cmake sits next to this file).
+include("${CMAKE_CURRENT_LIST_DIR}/win32toolsTargets.cmake")
+
+check_required_components(win32tools)
