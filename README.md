@@ -1,6 +1,6 @@
 # win32tools
 
-A header-driven C++17 toolkit for Windows system programming. Provides process and memory utilities, high-performance pattern scanning, DLL injection, hardware fingerprinting, IOCP-based async networking (TCP + UDP), synchronous named pipes, and a binary serialisation layer � all under the `w32t` namespace with consistent, RAII-safe APIs.
+A header-driven C++17 toolkit for Windows system programming. Provides process and memory utilities, high-performance pattern scanning, DLL injection, hardware fingerprinting, IOCP-based async networking (TCP + UDP), synchronous named pipes, and a binary serialisation layer — all under the `w32t` namespace with consistent, RAII-safe APIs.
 
 released by: some person at his private residence
 ---
@@ -45,26 +45,26 @@ released by: some person at his private residence
 
 ```
 win32tools/
-??? Tools/
-?   ??? Core.hpp / Core.cpp          # Base process & memory utilities
-?   ??? Scanner.hpp / Scanner.cpp    # Pattern scanner v2 (BMH + bitmask)
-?   ??? HaxHelper.hpp / HaxHelper.cpp# Remote dump + pattern scan facade
-?   ??? Inject.hpp / Inject.cpp      # DLL injection (LoadLibraryW + shellcode)
-?   ??? DriveInfo.hpp / DriveInfo.cpp# Hardware fingerprinting (HDD, MAC, HWID)
-?
-??? Network/
-?   ??? Packet.hpp / Packet.cpp      # Binary serialisation (LE, length-prefixed)
-?   ??? Socket.hpp / Socket.cpp      # RAII Winsock handle wrapper
-?   ??? NetworkSocket.hpp / .cpp     # Synchronous TCP/UDP with Packet framing
-?   ??? NamedPipe.hpp / NamedPipe.cpp# Synchronous named pipe (server + client)
-?   ??? IocpBase.hpp                 # Shared IOCP structs, pool, protocol framing
-?   ??? IocpTcpServer.hpp / .cpp     # Async IOCP TCP server (multi-client)
-?   ??? IocpTcpClient.hpp / .cpp     # Async IOCP TCP client
-?   ??? IocpUdpServer.hpp / .cpp     # Async IOCP UDP server (peer tracking)
-?   ??? IocpUdpClient.hpp / .cpp     # Async IOCP UDP client (connected + unconnected)
-?
-??? demo/
-    ??? main.cpp                     # Stand-alone integration test & demo runner
+├── Tools/
+│   ├── Core.hpp / Core.cpp           # Base process & memory utilities
+│   ├── Scanner.hpp / Scanner.cpp     # Pattern scanner v2 (BMH + bitmask)
+│   ├── HaxHelper.hpp / HaxHelper.cpp # Remote dump + pattern scan facade
+│   ├── Inject.hpp / Inject.cpp       # DLL injection (LoadLibraryW + shellcode)
+│   └── DriveInfo.hpp / DriveInfo.cpp # Hardware fingerprinting (HDD, MAC, HWID)
+│
+├── Network/
+│   ├── Packet.hpp / Packet.cpp       # Binary serialisation (LE, length-prefixed)
+│   ├── Socket.hpp / Socket.cpp       # RAII Winsock handle wrapper
+│   ├── NetworkSocket.hpp / .cpp      # Synchronous TCP/UDP with Packet framing
+│   ├── NamedPipe.hpp / NamedPipe.cpp # Synchronous named pipe (server + client)
+│   ├── IocpBase.hpp                  # Shared IOCP structs, pool, protocol framing
+│   ├── IocpTcpServer.hpp / .cpp      # Async IOCP TCP server (multi-client)
+│   ├── IocpTcpClient.hpp / .cpp      # Async IOCP TCP client
+│   ├── IocpUdpServer.hpp / .cpp      # Async IOCP UDP server (peer tracking)
+│   └── IocpUdpClient.hpp / .cpp      # Async IOCP UDP client (connected + unconnected)
+│
+└── demo/
+    └── main.cpp                      # Stand-alone integration test & demo runner
 ```
 
 ---
@@ -138,16 +138,16 @@ w32t::Core::appendBytes(buf, anotherByteVec);
 
 **Header:** `win32tools/Tools/Scanner.hpp`
 
-High-performance byte-pattern scanner using a Boyer�Moore�Horspool (BMH) bad-character skip table, a 64-bit concrete-byte bitmask, and sentinel pre-checks. Up to 6� faster than a na�ve `memchr` loop on typical 12�20 byte signatures. Maximum pattern length is 64 bytes.
+High-performance byte-pattern scanner using a Boyer–Moore–Horspool (BMH) bad-character skip table, a 64-bit concrete-byte bitmask, and sentinel pre-checks. Up to 6× faster than a naïve `memchr` loop on typical 12–20 byte signatures. Maximum pattern length is 64 bytes.
 
 #### Pattern Creation
 
 Two input formats are supported.
 
-**IDA-style** (`"48 8B ? ? 05 ?? AB"` � spaces delimit bytes, `?` or `??` is wildcard):
+**IDA-style** (`"48 8B ? ? 05 ?? AB"` — spaces delimit bytes, `?` or `??` is wildcard):
 
 ```cpp
-// Owning (heap-allocated storage � recommended for most uses)
+// Owning (heap-allocated storage — recommended for most uses)
 w32t::PatternOwned owned = w32t::PatternOwned::from_ida("48 8B 05 ?? ??");
 if (owned.valid()) { /* use owned.get() */ }
 
@@ -171,17 +171,17 @@ auto owned = w32t::PatternOwned::from_char_mask(bytes, "xxxx");
 #### Scanning Functions
 
 ```cpp
-// Scan a flat memory region � returns pointer to first match or nullptr
+// Scan a flat memory region — returns pointer to first match or nullptr
 const uint8_t* hit = w32t::scan_region(base, size, pat, align /*default 1*/);
 
-// Scan a VA range respecting VirtualQuery page permissions � returns address or 0
+// Scan a VA range respecting VirtualQuery page permissions — returns address or 0
 uintptr_t addr = w32t::scan(start, end, pat, align);
 
-// Find ALL matches � returns count of hits written to out_buf
+// Find ALL matches — returns count of hits written to out_buf
 uintptr_t results[16]{};
 size_t count = w32t::scan_all(start, end, pat, results, 16);
 
-// Scan for MULTIPLE patterns in a single pass � returns number of patterns found
+// Scan for MULTIPLE patterns in a single pass — returns number of patterns found
 w32t::Pattern pats[2] = { patA, patB };
 uintptr_t addrs[2]    = {};
 size_t found = w32t::scan_multi(start, end, pats, addrs, 2);
@@ -214,7 +214,7 @@ Dumps a remote (or self) process module into a local buffer and runs Scanner v2 
 ```cpp
 w32t::HaxHelper hax("target.exe");
 
-// Dump the target module (idempotent � cached after first successful call)
+// Dump the target module (idempotent — cached after first successful call)
 if (hax.dumpMemory()) {
     std::cout << hax.dumpedSize() << " bytes dumped\n";
 }
@@ -222,7 +222,7 @@ if (hax.dumpMemory()) {
 // Get the MODULEENTRY32 for address translation
 auto mod = w32t::Core::getModuleFromPid(pid, "target.exe");
 
-// IDA-style scan � returns address in the REMOTE process
+// IDA-style scan — returns address in the REMOTE process
 uintptr_t addr = hax.findExternalIda(*mod, "48 8B 05 ?? ?? ?? ??");
 
 // Char-mask scan
@@ -249,7 +249,7 @@ w32t::HaxHelper::injectDll(targetPid, "C:\\path\\payload.dll");
 
 DLL injection via two techniques.
 
-#### Technique 1 � `LoadLibraryW` + `CreateRemoteThread` (recommended)
+#### Technique 1 — `LoadLibraryW` + `CreateRemoteThread` (recommended)
 
 Standard and reliable. Uses UTF-16 path to support Unicode DLL paths correctly.
 
@@ -267,7 +267,7 @@ injector.injectIntoProcess(targetPid, "C:\\payload.dll");
 
 Steps performed internally: resolve `LoadLibraryW` address ? `OpenProcess` ? `VirtualAllocEx` + `WriteProcessMemory` the UTF-16 path ? `CreateRemoteThread` ? `WaitForSingleObject` ? verify exit code ? clean up.
 
-#### Technique 2 � x64 Shellcode
+#### Technique 2 — x64 Shellcode
 
 Builds and executes a minimal x64 shellcode stub that calls `LoadLibraryA` directly, respecting the x64 calling convention (RCX + 40-byte shadow space).
 
@@ -288,7 +288,7 @@ Reads hardware identifiers. Results are cached after the first successful call.
 ```cpp
 w32t::DriveInfo di;
 
-// HDD serial number (SMART_RCV_DRIVE_DATA IOCTL � requires admin, IDE/SATA only)
+// HDD serial number (SMART_RCV_DRIVE_DATA IOCTL — requires admin, IDE/SATA only)
 std::string serial = di.hddSerial();
 
 // Network adapter MAC address (no elevated privileges required)
@@ -445,7 +445,7 @@ Internal infrastructure shared by all four IOCP classes. Not used directly.
 
 Provides: `IocpOp` (OVERLAPPED wrapper), `IoContext`, `SendReq` (16-byte-aligned SLIST pool node), `NetProtocol` enum, `detectProtocol()`, and lock-free pool helpers (`pool_init`, `pool_acquire`, `pool_release`, `pool_drain`).
 
-**Protocol auto-detection:** the first byte received determines framing mode. A printable ASCII byte (0x20�0x7E) selects `Telnet` (newline-delimited text); any other byte selects `Packet` (4-byte LE length prefix).
+**Protocol auto-detection:** the first byte received determines framing mode. A printable ASCII byte (0x20–0x7E) selects `Telnet` (newline-delimited text); any other byte selects `Packet` (4-byte LE length prefix).
 
 **Constants:**
 
@@ -463,7 +463,7 @@ Provides: `IocpOp` (OVERLAPPED wrapper), `IoContext`, `SendReq` (16-byte-aligned
 
 **Headers:** `win32tools/Network/IocpTcpServer.hpp`, `win32tools/Network/IocpTcpClient.hpp`
 
-Fully asynchronous TCP server and client built on Windows IOCP. All I/O dispatches through a configurable worker thread pool. Callbacks fire on worker threads � keep them short and non-blocking.
+Fully asynchronous TCP server and client built on Windows IOCP. All I/O dispatches through a configurable worker thread pool. Callbacks fire on worker threads — keep them short and non-blocking.
 
 #### Server
 
@@ -481,7 +481,7 @@ cb.on_close = [](w32t::TcpClientHandle c) { /* cleanup */ };
 w32t::IocpTcpServer server;
 server.init(cb, /*workerCount=*/2);
 
-// Blocking accept loop � run on a dedicated thread
+// Blocking accept loop — run on a dedicated thread
 std::thread t([&]{ server.listen(9000); });
 
 // Send to a specific client
@@ -566,7 +566,7 @@ udpSrv.stop();
 udpSrv.shutdown();
 ```
 
-#### Client � Connected Mode
+#### Client — Connected Mode
 
 ```cpp
 w32t::UdpClientCallbacks cb;
@@ -579,7 +579,7 @@ client.send(data, len);
 client.disconnect();
 ```
 
-#### Client � Unconnected (Bind) Mode
+#### Client — Unconnected (Bind) Mode
 
 ```cpp
 w32t::IocpUdpClient client2;
@@ -603,7 +603,7 @@ client2.disconnect();
 
 ## Demo (`demo/main.cpp`)
 
-The `demo/` folder contains a standalone integration test runner (`main.cpp`) that exercises every module. It is compiled separately from the library itself � it is included for reference and manual testing only.
+The `demo/` folder contains a standalone integration test runner (`main.cpp`) that exercises every module. It is compiled separately from the library itself — it is included for reference and manual testing only.
 
 > Build the library first, then build the demo against it. Do not add `main.cpp` to your library project.
 
@@ -626,7 +626,7 @@ The demo presents an interactive menu and can run all tests sequentially or indi
 
 ### Admin-sensitive tests
 
-Tests 2 (DriveInfo HDD serial) and 10 (Inject) require the demo to be run as Administrator. All other tests run under a standard user account. The demo degrades gracefully � failing tests print a warning rather than aborting.
+Tests 2 (DriveInfo HDD serial) and 10 (Inject) require the demo to be run as Administrator. All other tests run under a standard user account. The demo degrades gracefully — failing tests print a warning rather than aborting.
 
 ### Building the demo
 
